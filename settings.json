@@ -1,0 +1,7 @@
+{
+	"charset_priority": ["utf-8"],
+	"args": "--line-break=3000 --preserve-semi",
+	"suffixes": ["-min", ".min"],
+	"default_suffix": "-min",
+	"open_tab_when_saved": false
+}
