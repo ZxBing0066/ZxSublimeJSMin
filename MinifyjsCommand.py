@@ -10,9 +10,10 @@ code_charset = None
 open_tab_when_saved = None
 PLUGIN_DIRECTORY = script_path()
 
+# 获取当前文件的路径
 def script_path():
     import inspect
-    caller_file = inspect.stack()[1][1]         # caller's filename
+    caller_file = inspect.stack()[1][1]# caller's filename
     return os.path.abspath(os.path.dirname(caller_file))# path
 
 def replaceWithNewCode(view):
@@ -40,11 +41,14 @@ class LoadListener(sublime_plugin.EventListener):
 			targetView = None
 
 
-class MinifyjsCommand(sublime_plugin.TextCommand):
+class ZxMinifyjsCommand(sublime_plugin.TextCommand):
 	__window = None
 	__view = None
 
 	def run(self, edit):
+		self.__view = self.view
+		self.__window = self.view.window()
+
 		# # #
 		# # # Read our settings file
 		# # #
@@ -87,9 +91,6 @@ class MinifyjsCommand(sublime_plugin.TextCommand):
 
 		processCommand = self.__getCommand('"' + os.path.normpath("%s/compiler.jar" % (PLUGIN_DIRECTORY)) + '"', filename)
 
-		self.__view = self.view
-		self.__window = self.view.window()
-
 		results = []
 
 
@@ -103,9 +104,14 @@ class MinifyjsCommand(sublime_plugin.TextCommand):
 		print(results)
 		ret = p.wait()
 
+		temp_file = self.__window.find_open_file("压缩结果")
+		temp_file = self.__window.new_file()
+		temp_file.set_name("压缩结果")
 		newCode = self.__getNewCode(results)
-		print(newCode)
-
+		if len(newCode) < 1:
+			newCode = '压缩成功!!!'
+		print("newCode", newCode)
+		temp_file.insert(edit, 0, newCode)
 
 		# #
 		# # Display the results in a new tab, or alter existing minified file.
